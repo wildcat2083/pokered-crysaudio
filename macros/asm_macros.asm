@@ -1,6 +1,6 @@
 
 lb: MACRO ; r, hi, lo
-	ld \1, (\2) << 8 + ((\3) & $ff)
+	ld \1, ((\2) & $ff) << 8 + ((\3) & $ff)
 ENDM
 
 homecall: MACRO
@@ -109,7 +109,11 @@ ENDM
 
 ; macro for two nibbles
 dn: MACRO
-	db (\1 << 4 | \2)
+rept _NARG / 2
+	db ((\1) << 4) | (\2)
+	shift
+	shift
+endr
 ENDM
 
 ; macro for putting a byte then a word
@@ -195,6 +199,10 @@ ENDM
 tx_pre_jump: MACRO
 	tx_pre_id \1
 	jp PrintPredefTextID
+ENDM
+
+ldPal: MACRO
+	ld \1, \2 << 6 | \3 << 4 | \4 << 2 | \5
 ENDM
 
 inc_section: MACRO

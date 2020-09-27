@@ -92,6 +92,8 @@ const_value = 1
 	const MUSIC_MEET_FEMALE_TRAINER
 	const MUSIC_MEET_MALE_TRAINER
 
+	const NUM_SONGS
+
 
 const_value = 1
 	; AUDIO_1 AUDIO_3
@@ -137,7 +139,7 @@ const_value = 1
 	const SFX_SAVE
 
 	; AUDIO_1
-	const SFX_POKEFLUE
+	const SFX_POKEFLUTE
 	const SFX_SAFARI_ZONE_PA
 
 	; AUDIO_2

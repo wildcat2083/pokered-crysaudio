@@ -1,4 +1,3 @@
-
 INCLUDE "constants.asm"
 
 flag_array: MACRO
@@ -41,6 +40,7 @@ ENDM
 battle_struct: MACRO
 \1Species::    db
 \1HP::         dw
+\1PartyPos::
 \1BoxLevel::   db
 \1Status::     db
 \1Type::
@@ -206,7 +206,7 @@ wTempoModifier:: ; c0f2
 wHaltAudio:: ds 1
 wSFXDontWait:: ds 1
 
-SECTION "Sprite State Data", WRAM0[$c100]
+SECTION "Sprite State Data", WRAM0
 
 wSpriteDataStart::
 
@@ -231,10 +231,9 @@ wSpriteStateData1:: ; c100
 ; C1xE
 ; C1xF
 spritestatedata1: MACRO
-\1SpriteStateData1::
 \1PictureID:: db
 \1MovementStatus:: db
-\1SpriteImageIdx:: db
+\1ImageIndex:: db
 \1YStepVector:: db
 \1YPixels:: db
 \1XStepVector:: db
@@ -243,29 +242,25 @@ spritestatedata1: MACRO
 \1AnimFrameCounter:: db
 \1FacingDirection:: db
 	ds 6
-\1SpriteStateData1End::
+\1End::
 endm
 
-	spritestatedata1 Player
-	spritestatedata1 Sprite01
-	spritestatedata1 Sprite02
-	spritestatedata1 Sprite03
-	spritestatedata1 Sprite04
-	spritestatedata1 Sprite05
-	spritestatedata1 Sprite06
-	spritestatedata1 Sprite07
-	spritestatedata1 Sprite08
-	spritestatedata1 Sprite09
-	spritestatedata1 Sprite10
-	spritestatedata1 Sprite11
-	spritestatedata1 Sprite12
-	spritestatedata1 Sprite13
-	spritestatedata1 Sprite14
-	spritestatedata1 Sprite15
-	; ds $10 * $10
-
-
-;SECTION "Sprite State Data 2", WRAM0[$c200]
+wSpritePlayerStateData1::  spritestatedata1 wSpritePlayerStateData1
+wSprite01StateData1::      spritestatedata1 wSprite01StateData1
+wSprite02StateData1::      spritestatedata1 wSprite02StateData1
+wSprite03StateData1::      spritestatedata1 wSprite03StateData1
+wSprite04StateData1::      spritestatedata1 wSprite04StateData1
+wSprite05StateData1::      spritestatedata1 wSprite05StateData1
+wSprite06StateData1::      spritestatedata1 wSprite06StateData1
+wSprite07StateData1::      spritestatedata1 wSprite07StateData1
+wSprite08StateData1::      spritestatedata1 wSprite08StateData1
+wSprite09StateData1::      spritestatedata1 wSprite09StateData1
+wSprite10StateData1::      spritestatedata1 wSprite10StateData1
+wSprite11StateData1::      spritestatedata1 wSprite11StateData1
+wSprite12StateData1::      spritestatedata1 wSprite12StateData1
+wSprite13StateData1::      spritestatedata1 wSprite13StateData1
+wSprite14StateData1::      spritestatedata1 wSprite14StateData1
+wSprite15StateData1::      spritestatedata1 wSprite15StateData1
 
 wSpriteStateData2:: ; c200
 ; more data for all sprites on the current map
@@ -288,7 +283,6 @@ wSpriteStateData2:: ; c200
 ; C2xE: sprite image base offset (in video ram, player always has value 1, used to compute c1x2)
 ; C2xF
 spritestatedata2: MACRO
-\1SpriteStateData2::
 \1WalkAnimationCounter:: db
 	ds 1
 \1YDisplacement:: db
@@ -299,33 +293,33 @@ spritestatedata2: MACRO
 \1GrassPriority:: db
 \1MovementDelay:: db
 	ds 5
-\1SpriteImageBaseOffset:: db
+\1ImageBaseOffset:: db
 	ds 1
-\1SpriteStateData2End::
+\1End::
 endm
 
-	spritestatedata2 Player
-	spritestatedata2 Sprite01
-	spritestatedata2 Sprite02
-	spritestatedata2 Sprite03
-	spritestatedata2 Sprite04
-	spritestatedata2 Sprite05
-	spritestatedata2 Sprite06
-	spritestatedata2 Sprite07
-	spritestatedata2 Sprite08
-	spritestatedata2 Sprite09
-	spritestatedata2 Sprite10
-	spritestatedata2 Sprite11
-	spritestatedata2 Sprite12
-	spritestatedata2 Sprite13
-	spritestatedata2 Sprite14
-	spritestatedata2 Sprite15
-	; ds $10 * $10
+wSpritePlayerStateData2::  spritestatedata2 wSpritePlayerStateData2
+wSprite01StateData2::      spritestatedata2 wSprite01StateData2
+wSprite02StateData2::      spritestatedata2 wSprite02StateData2
+wSprite03StateData2::      spritestatedata2 wSprite03StateData2
+wSprite04StateData2::      spritestatedata2 wSprite04StateData2
+wSprite05StateData2::      spritestatedata2 wSprite05StateData2
+wSprite06StateData2::      spritestatedata2 wSprite06StateData2
+wSprite07StateData2::      spritestatedata2 wSprite07StateData2
+wSprite08StateData2::      spritestatedata2 wSprite08StateData2
+wSprite09StateData2::      spritestatedata2 wSprite09StateData2
+wSprite10StateData2::      spritestatedata2 wSprite10StateData2
+wSprite11StateData2::      spritestatedata2 wSprite11StateData2
+wSprite12StateData2::      spritestatedata2 wSprite12StateData2
+wSprite13StateData2::      spritestatedata2 wSprite13StateData2
+wSprite14StateData2::      spritestatedata2 wSprite14StateData2
+wSprite15StateData2::      spritestatedata2 wSprite15StateData2
+
 
 wSpriteDataEnd::
 
 
-SECTION "OAM Buffer", WRAM0[$c300]
+SECTION "OAM Buffer", WRAM0
 
 wOAMBuffer:: ; c300
 ; buffer for OAM data. Copied to OAM by DMA
@@ -1239,6 +1233,8 @@ wNumMovesMinusOne:: ; cd6c
 ; FormatMovesString stores the number of moves minus one here
 	ds 1
 
+UNION
+
 wcd6d:: ds 4 ; buffer for various data
 
 wStatusScreenCurrentPP:: ; cd71
@@ -1250,6 +1246,13 @@ wStatusScreenCurrentPP:: ; cd71
 wNormalMaxPPList:: ; cd78
 ; list of normal max PP (without PP up) values
 	ds 9
+
+NEXTU
+
+wEvosMoves:: ds MAX_EVOLUTIONS * EVOLUTION_SIZE + 1
+.end::
+
+ENDU
 
 wSerialOtherGameboyRandomNumberListBlock:: ; cd81
 ; buffer for transferring the random number list generated by the other gameboy
@@ -1583,40 +1586,10 @@ wBattleMonSpecies2:: ; cfd9
 
 wEnemyMonNick:: ds NAME_LENGTH ; cfda
 
-wEnemyMon:: ; cfe5
-; The wEnemyMon struct reaches past 0xcfff,
-; the end of wram bank 0 on cgb.
-; This has no significance on dmg, where wram
-; isn't banked (c000-dfff is contiguous).
-; However, recent versions of rgbds have replaced
-; dmg-style wram with cgb wram banks.
-
-; Until this is fixed, this struct will have
-; to be declared manually.
-
-wEnemyMonSpecies::   db
-wEnemyMonHP::        dw
-wEnemyMonPartyPos::
-wEnemyMonBoxLevel::  db
-wEnemyMonStatus::    db
-wEnemyMonType::
-wEnemyMonType1::     db
-wEnemyMonType2::     db
-wEnemyMonCatchRate_NotReferenced:: db
-wEnemyMonMoves::     ds NUM_MOVES
-wEnemyMonDVs::       ds 2
-wEnemyMonLevel::     db
-wEnemyMonMaxHP::     dw
-wEnemyMonAttack::    dw
-wEnemyMonDefense::   dw
-wEnemyMonSpeed::     dw
-wEnemyMonSpecial::   dw
-wEnemyMonPP::        ds 2 ; NUM_MOVES - 2
-SECTION "WRAM Bank 1", WRAMX, BANK[1]
-                     ds 2 ; NUM_MOVES - 2
+wEnemyMon:: battle_struct wEnemyMon ; cfe5
 
 wEnemyMonBaseStats:: ds 5
-wEnemyMonCatchRate:: ds 1
+wEnemyMonActualCatchRate:: ds 1
 wEnemyMonBaseExp:: ds 1
 
 wBattleMonNick:: ds NAME_LENGTH ; d009
@@ -1737,7 +1710,7 @@ wPlayerBattleStatus3:: ; d064
 ; bit 0 - toxic
 ; bit 1 - light screen
 ; bit 2 - reflect
-; bit 3 - tranformed
+; bit 3 - transformed
 	ds 1
 
 wEnemyStatsToDouble:: ; d065
@@ -2048,7 +2021,7 @@ wPredefBank:: ; d0b7
 wMonHeader:: ; d0b8
 
 wMonHIndex:: ; d0b8
-; In the ROM base stats data stucture, this is the dex number, but it is
+; In the ROM base stats data structure, this is the dex number, but it is
 ; overwritten with the internal index number after the header is copied to WRAM.
 	ds 1
 
@@ -2700,8 +2673,6 @@ wMissableObjectList:: ; d5ce
 
 wGameProgressFlags:: ; d5f0
 ; $c8 bytes
-	ds 0
-
 wOaksLabCurScript:: ; d5f0
 	ds 1
 wPalletTownCurScript:: ; d5f1
@@ -2741,31 +2712,31 @@ wRoute9CurScript:: ; d604
 	ds 1
 wRoute10CurScript:: ; d605
 	ds 1
-wMtMoon1CurScript:: ; d606
+wMtMoon1FCurScript:: ; d606
 	ds 1
-wMtMoon3CurScript:: ; d607
+wMtMoonB2FCurScript:: ; d607
 	ds 1
-wSSAnne8CurScript:: ; d608
+wSSAnne1FRoomsCurScript:: ; d608
 	ds 1
-wSSAnne9CurScript:: ; d609
+wSSAnne2FRoomsCurScript:: ; d609
 	ds 1
 wRoute22CurScript:: ; d60a
 	ds 1
 	ds 1
-wRedsHouse2CurScript:: ; d60c
+wRedsHouse2FCurScript:: ; d60c
 	ds 1
-wViridianMarketCurScript:: ; d60d
+wViridianMartCurScript:: ; d60d
 	ds 1
 wRoute22GateCurScript:: ; d60e
 	ds 1
 wCeruleanCityCurScript:: ; d60f
 	ds 1
 	ds 7
-wSSAnne5CurScript:: ; d617
+wSSAnneBowCurScript:: ; d617
 	ds 1
 wViridianForestCurScript:: ; d618
 	ds 1
-wMuseum1fCurScript:: ; d619
+wMuseum1FCurScript:: ; d619
 	ds 1
 wRoute13CurScript:: ; d61a
 	ds 1
@@ -2777,11 +2748,11 @@ wRoute19CurScript:: ; d61d
 	ds 1
 wRoute21CurScript:: ; d61e
 	ds 1
-wSafariZoneEntranceCurScript:: ; d61f
+wSafariZoneGateCurScript:: ; d61f
 	ds 1
-wRockTunnel2CurScript:: ; d620
+wRockTunnelB1FCurScript:: ; d620
 	ds 1
-wRockTunnel1CurScript:: ; d621
+wRockTunnel1FCurScript:: ; d621
 	ds 1
 	ds 1
 wRoute11CurScript:: ; d623
@@ -2796,29 +2767,29 @@ wRoute18CurScript:: ; d627
 	ds 1
 wRoute20CurScript:: ; d628
 	ds 1
-wSSAnne10CurScript:: ; d629
+wSSAnneB1FRoomsCurScript:: ; d629
 	ds 1
 wVermilionCityCurScript:: ; d62a
 	ds 1
-wPokemonTower2CurScript:: ; d62b
+wPokemonTower2FCurScript:: ; d62b
 	ds 1
-wPokemonTower3CurScript:: ; d62c
+wPokemonTower3FCurScript:: ; d62c
 	ds 1
-wPokemonTower4CurScript:: ; d62d
+wPokemonTower4FCurScript:: ; d62d
 	ds 1
-wPokemonTower5CurScript:: ; d62e
+wPokemonTower5FCurScript:: ; d62e
 	ds 1
-wPokemonTower6CurScript:: ; d62f
+wPokemonTower6FCurScript:: ; d62f
 	ds 1
-wPokemonTower7CurScript:: ; d630
+wPokemonTower7FCurScript:: ; d630
 	ds 1
-wRocketHideout1CurScript:: ; d631
+wRocketHideoutB1FCurScript:: ; d631
 	ds 1
-wRocketHideout2CurScript:: ; d632
+wRocketHideoutB2FCurScript:: ; d632
 	ds 1
-wRocketHideout3CurScript:: ; d633
+wRocketHideoutB3FCurScript:: ; d633
 	ds 1
-wRocketHideout4CurScript:: ; d634
+wRocketHideoutB4FCurScript:: ; d634
 	ds 2
 wRoute6GateCurScript:: ; d636
 	ds 1
@@ -2826,57 +2797,57 @@ wRoute8GateCurScript:: ; d637
 	ds 2
 wCinnabarIslandCurScript:: ; d639
 	ds 1
-wMansion1CurScript:: ; d63a
+wPokemonMansion1FCurScript:: ; d63a
 	ds 2
-wMansion2CurScript:: ; d63c
+wPokemonMansion2FCurScript:: ; d63c
 	ds 1
-wMansion3CurScript:: ; d63d
+wPokemonMansion3FCurScript:: ; d63d
 	ds 1
-wMansion4CurScript:: ; d63e
+wPokemonMansionB1FCurScript:: ; d63e
 	ds 1
-wVictoryRoad2CurScript:: ; d63f
+wVictoryRoad2FCurScript:: ; d63f
 	ds 1
-wVictoryRoad3CurScript:: ; d640
+wVictoryRoad3FCurScript:: ; d640
 	ds 2
 wFightingDojoCurScript:: ; d642
 	ds 1
-wSilphCo2CurScript:: ; d643
+wSilphCo2FCurScript:: ; d643
 	ds 1
-wSilphCo3CurScript:: ; d644
+wSilphCo3FCurScript:: ; d644
 	ds 1
-wSilphCo4CurScript:: ; d645
+wSilphCo4FCurScript:: ; d645
 	ds 1
-wSilphCo5CurScript:: ; d646
+wSilphCo5FCurScript:: ; d646
 	ds 1
-wSilphCo6CurScript:: ; d647
+wSilphCo6FCurScript:: ; d647
 	ds 1
-wSilphCo7CurScript:: ; d648
+wSilphCo7FCurScript:: ; d648
 	ds 1
-wSilphCo8CurScript:: ; d649
+wSilphCo8FCurScript:: ; d649
 	ds 1
-wSilphCo9CurScript:: ; d64a
+wSilphCo9FCurScript:: ; d64a
 	ds 1
-wHallOfFameRoomCurScript:: ; d64b
+wHallOfFameCurScript:: ; d64b
 	ds 1
-wGaryCurScript:: ; d64c
+wChampionsRoomCurScript:: ; d64c
 	ds 1
-wLoreleiCurScript:: ; d64d
+wLoreleisRoomCurScript:: ; d64d
 	ds 1
-wBrunoCurScript:: ; d64e
+wBrunosRoomCurScript:: ; d64e
 	ds 1
-wAgathaCurScript:: ; d64f
+wAgathasRoomCurScript:: ; d64f
 	ds 1
-wUnknownDungeon3CurScript:: ; d650
+wCeruleanCaveB1FCurScript:: ; d650
 	ds 1
-wVictoryRoad1CurScript:: ; d651
+wVictoryRoad1FCurScript:: ; d651
 	ds 1
 	ds 1
-wLanceCurScript:: ; d653
+wLancesRoomCurScript:: ; d653
 	ds 1
 	ds 4
-wSilphCo10CurScript:: ; d658
+wSilphCo10FCurScript:: ; d658
 	ds 1
-wSilphCo11CurScript:: ; d659
+wSilphCo11FCurScript:: ; d659
 	ds 1
 	ds 1
 wFuchsiaGymCurScript:: ; d65b
@@ -2886,30 +2857,28 @@ wSaffronGymCurScript:: ; d65c
 	ds 1
 wCinnabarGymCurScript:: ; d65e
 	ds 1
-wCeladonGameCornerCurScript:: ; d65f
+wGameCornerCurScript:: ; d65f
 	ds 1
-wRoute16GateCurScript:: ; d660
+wRoute16Gate1FCurScript:: ; d660
 	ds 1
 wBillsHouseCurScript:: ; d661
 	ds 1
 wRoute5GateCurScript:: ; d662
 	ds 1
 wPowerPlantCurScript:: ; d663
-; overload
-	ds 0
 wRoute7GateCurScript:: ; d663
 ; overload
 	ds 1
 	ds 1
-wSSAnne2CurScript:: ; d665
+wSSAnne2FCurScript:: ; d665
 	ds 1
-wSeafoamIslands4CurScript:: ; d666
+wSeafoamIslandsB3FCurScript:: ; d666
 	ds 1
 wRoute23CurScript:: ; d667
 	ds 1
-wSeafoamIslands5CurScript:: ; d668
+wSeafoamIslandsB4FCurScript:: ; d668
 	ds 1
-wRoute18GateCurScript:: ; d669
+wRoute18Gate1FCurScript:: ; d669
 	ds 1
 
 	ds 78
@@ -3059,7 +3028,7 @@ wd732:: ; d732
 ; bit 1: remnant of debug mode? not set by the game code.
 ; if it is set
 ; 1. skips most of Prof. Oak's speech, and uses NINTEN as the player's name and SONY as the rival's name
-; 2. does not have the player start in floor two of the playyer's house (instead sending them to [wLastMap])
+; 2. does not have the player start in floor two of the player's house (instead sending them to [wLastMap])
 ; 3. allows wild battles to be avoided by holding down B
 ; bit 2: the target warp is a fly warp (bit 3 set or blacked out) or a dungeon warp (bit 4 set)
 ; bit 3: used warp pad, escape rope, dig, teleport, or fly, so the target warp is a "fly warp"
@@ -3087,7 +3056,7 @@ wd736:: ; d736
 ; bit 1: the player is currently stepping down from a door
 ; bit 2: standing on a warp
 ; bit 6: jumping down a ledge / fishing animation
-; bit 7: player sprite spinning due to spin tiles (Rocket hidehout / Viridian Gym)
+; bit 7: player sprite spinning due to spin tiles (Rocket hideout / Viridian Gym)
 	ds 1
 
 wCompletedInGameTradeFlags:: ; d737
@@ -3139,10 +3108,12 @@ wEnemyPartyCount:: ds 1     ; d89c
 wEnemyPartyMons::  ds PARTY_LENGTH + 1 ; d89d
 
 ; Overload enemy party data
+UNION
+
 wWaterRate:: db ; d8a4
 wWaterMons:: db ; d8a5
 
-	ds wWaterRate - @
+NEXTU
 
 wEnemyMons:: ; d8a4
 wEnemyMon1:: party_struct wEnemyMon1
@@ -3154,6 +3125,8 @@ wEnemyMon6:: party_struct wEnemyMon6
 
 wEnemyMonOT::    ds NAME_LENGTH * PARTY_LENGTH ; d9ac
 wEnemyMonNicks:: ds NAME_LENGTH * PARTY_LENGTH ; d9ee
+
+ENDU
 
 
 wTrainerHeaderPtr:: ; da30
@@ -3170,7 +3143,7 @@ wUnusedDA38:: ; da38
 
 wCurMapScript:: ; da39
 ; index of current map script, mostly used as index for function pointer array
-; mostly copied from map-specific map script pointer and wirtten back later
+; mostly copied from map-specific map script pointer and written back later
 	ds 1
 
 	ds 7
@@ -3221,9 +3194,9 @@ wBoxMonNicksEnd:: ; dee2
 
 wBoxDataEnd::
 
+; dee2
 
-SECTION "Stack", WRAMX[$df00], BANK[1]
-	ds $ff
+SECTION "Stack", WRAM0
 wStack:: ; dfff
 
 
@@ -3231,317 +3204,158 @@ INCLUDE "sram.asm"
 
 
 SECTION "crysaudio", SRAM, BANK[0]
-Crysaudio::
-MusicPlaying:: ; c100
+
+channel_struct: MACRO
+; Addreses are wChannel1 (c101).
+\1MusicID::           dw
+\1MusicBank::         db
+\1Flags1::            db ; 0:on/off 1:subroutine 3:sfx 4:noise 5:rest
+\1Flags2::            db ; 0:vibrato on/off 2:duty 4:cry pitch
+\1Flags3::            db ; 0:vibrato up/down
+\1MusicAddress::      dw
+\1LastMusicAddress::  dw
+                      dw
+\1NoteFlags::         db ; 5:rest
+\1Condition::         db ; conditional jumps
+\1DutyCycle::         db ; bits 6-7 (0:12.5% 1:25% 2:50% 3:75%)
+\1Intensity::         db ; hi:pressure lo:velocity
+\1Frequency::         dw ; 11 bits
+\1Pitch::             db ; 0:rest 1-c:note
+\1Octave::            db ; 7-0 (0 is highest)
+\1PitchOffset::       db ; raises existing octaves (to repeat phrases)
+\1NoteDuration::      db ; frames remaining for the current note
+\1Field16::           ds 1
+                      ds 1
+\1LoopCount::         db
+\1Tempo::             dw
+\1Tracks::            db ; hi:left lo:right
+\1SFXDutyLoop::       db
+\1VibratoDelayCount:: db ; initialized by \1VibratoDelay
+\1VibratoDelay::      db ; number of frames a note plays until vibrato starts
+\1VibratoExtent::     db
+\1VibratoRate::       db ; hi:frames for each alt lo:frames to the next alt
+\1PitchWheelTarget::  dw ; frequency endpoint for pitch wheel
+\1PitchWheelAmount::  db
+\1PitchWheelAmountFraction::   db
+\1Field25::           db
+                      ds 1
+\1CryPitch::          dw
+\1Field29::           ds 1
+\1Field2a::           ds 2
+\1Field2c::           ds 1
+\1NoteLength::        db ; frames per 16th note
+\1Field2e::           ds 1
+\1Field2f::           ds 1
+\1Field30::           ds 1
+                      ds 1
+ENDM
+
+wMusic::
+
 ; nonzero if playing
-	ds 1
+wMusicPlaying:: db ; c100
 
-Channels::
-Channel1::
-Channel1MusicID:: ; c101
-	ds 2
-Channel1MusicBank:: ; c103
-	ds 1
-Channel1Flags:: ; c104
-; 0: on/off
-; 1: subroutine
-; 2: 
-; 3: 
-; 4: noise sampling on/off
-; 5: 
-; 6: 
-; 7: 
-	ds 1
-Channel1Flags2:: ; c105
-; 0: vibrato on/off
-; 1: 
-; 2: duty cycle on/off
-; 3: 
-; 4: 
-; 5: 
-; 6: 
-; 7: 
-	ds 1
-Channel1Flags3:: ; c106
-; 0: vibrato up/down
-; 1: 
-; 2: 
-; 3: 
-; 4: 
-; 5: 
-; 6: 
-; 7: 
-	ds 1
-Channel1MusicAddress:: ; c107
-	ds 2
-Channel1LastMusicAddress:: ; c109
-	ds 2
-; could have been meant as a third-level address
-	ds 2
-Channel1NoteFlags:: ; c10d
-; 0: 
-; 1: 
-; 2: 
-; 3: 
-; 4: 
-; 5: rest
-; 6: 
-; 7: 
-	ds 1
-Channel1Condition:: ; c10e
-; used for conditional jumps
-	ds 1
-Channel1DutyCycle:: ; c10f
-; uses top 2 bits only
-;	0: 12.5%
-;	1: 25%
-;	2: 50%
-;	3: 75%
-	ds 1
-Channel1Intensity:: ; c110
-;	hi: pressure
-;   lo: velocity
-	ds 1
-Channel1Frequency::
-; 11 bits
-Channel1FrequencyLo:: ; c111
-	ds 1
-Channel1FrequencyHi:: ; c112
-	ds 1
-Channel1Pitch:: ; c113
-; 0: rest
-; 1: C
-; 2: C#
-; 3: D
-; 4: D#
-; 5: E
-; 6: F
-; 7: F#
-; 8: G
-; 9: G#
-; a: A
-; b: A#
-; c: B
-	ds 1
-Channel1Octave:: ; c114
-; 0: highest
-; 7: lowest
-	ds 1
-Channel1StartingOctave:: ; c115
-; raises existing octaves by this value
-; used for repeating phrases in a higher octave to save space
-	ds 1
-Channel1NoteDuration:: ; c116
-; number of frames remaining in the current note
-	ds 1
-; c117
-	ds 1
-; c118
-	ds 1
-Channel1LoopCount:: ; c119
-	ds 1
-Channel1Tempo:: ; c11a
-	ds 2
-Channel1Tracks:: ; c11c
-; hi: l
-; lo: r
-	ds 1
-; c11d
-	ds 1
+wChannels::
+wChannel1:: channel_struct wChannel1 ; c101
+wChannel2:: channel_struct wChannel2 ; c133
+wChannel3:: channel_struct wChannel3 ; c165
+wChannel4:: channel_struct wChannel4 ; c197
 
-Channel1VibratoDelayCount:: ; c11e
-; initialized at the value in VibratoDelay
-; decrements each frame
-; at 0, vibrato starts
-	ds 1
-Channel1VibratoDelay:: ; c11f
-; number of frames a note plays until vibrato starts
-	ds 1
-Channel1VibratoExtent:: ; c120
-; difference in 
-	ds 1
-Channel1VibratoRate:: ; c121
-; counts down from a max of 15 frames
-; over which the pitch is alternated
-; hi: init frames
-; lo: frame count
-	ds 1
+wSFXChannels::
+wChannel5:: channel_struct wChannel5 ; c1c9
+wChannel6:: channel_struct wChannel6 ; c1fb
+wChannel7:: channel_struct wChannel7 ; c22d
+wChannel8:: channel_struct wChannel8 ; c25f
 
-; c122
-	ds 1
-; c123
-	ds 1
-; c124
-	ds 1
-; c125
-	ds 1
-; c126
-	ds 1
-; c127
-	ds 1
-Channel1CryPitch:: ; c128
-	ds 1
-Channel1CryEcho:: ; c129
-	ds 1
-	ds 4
-Channel1NoteLength:: ; c12e
-; # frames per 16th note
-	ds 1
-; c12f
-	ds 1
-; c130
-	ds 1
-; c131
-	ds 1
-; c132
-	ds 1
-; end
+	ds 1 ; c291
 
-Channel2:: ; c133
-	ds 50
-Channel3:: ; c165
-	ds 50
-Channel4:: ; c197
-	ds 50
+wCurTrackDuty:: db
+wCurTrackIntensity:: db
+wCurTrackFrequency:: dw
+wUnusedBCDNumber:: db ; BCD value, dummied out
+wCurNoteDuration:: db ; used in MusicE0 and LoadNote
 
-SFXChannels::
-Channel5:: ; c1c9
-	ds 50
-Channel6:: ; c1fb
-	ds 50
-Channel7:: ; c22d
-	ds 50
-Channel8:: ; c25f
-	ds 50
-
-; c291
-	ds 1
-; c292
-	ds 1
-; c293
-	ds 1
-; c294
-	ds 1
-; c295
-	ds 1
-; c296
-	ds 1
-; c297
-	ds 1
-
-CurMusicByte:: ; c298
-	ds 1
-CurChannel:: ; c299
-	ds 1
-Volume:: ; c29a
-; corresponds to $ff24
+wCurMusicByte:: db ; c298
+wCurChannel:: db ; c299
+wVolume:: ; c29a
+; corresponds to rNR50
 ; Channel control / ON-OFF / Volume (R/W)
 ;   bit 7 - Vin->SO2 ON/OFF
 ;   bit 6-4 - SO2 output level (volume) (# 0-7)
 ;   bit 3 - Vin->SO1 ON/OFF
 ;   bit 2-0 - SO1 output level (volume) (# 0-7)
-	ds 1
-SoundOutput:: ; c29b
-; corresponds to $ff25
+	db
+wSoundOutput:: ; c29b
+; corresponds to rNR51
 ; bit 4-7: ch1-4 so2 on/off
 ; bit 0-3: ch1-4 so1 on/off
-	ds 1
-SoundInput:: ; c29c
-; corresponds to $ff26
+	db
+wSoundInput:: ; c29c
+; corresponds to rNR52
 ; bit 7: global on/off
 ; bit 0: ch1 on/off
 ; bit 1: ch2 on/off
 ; bit 2: ch3 on/off
 ; bit 3: ch4 on/off
-	ds 1
+	db
 
-MusicID::
-MusicIDLo:: ; c29d
-	ds 1
-MusicIDHi:: ; c29e
-	ds 1
-MusicBank:: ; c29f
-	ds 1
-NoiseSampleAddress::
-NoiseSampleAddressLo:: ; c2a0
-	ds 1
-NoiseSampleAddressHi:: ; c2a1
-	ds 1
-; noise delay? ; c2a2
-	ds 1
-; c2a3
-	ds 1
-MusicNoiseSampleSet:: ; c2a4
-	ds 1
-SFXNoiseSampleSet:: ; c2a5
-	ds 1
-Danger:: ; c2a6
-wDanger:: ; because i'm dumb
+wMusicID:: dw ; c29d
+wMusicBank:: db ; c29f
+wNoiseSampleAddress:: dw ; c2a0
+wNoiseSampleDelay:: db ; c2a2
+	ds 1 ; c2a3
+wMusicNoiseSampleSet:: db ; c2a4
+wSFXNoiseSampleSet:: db ; c2a5
+
+;wLowHealthAlarm:: ; c2a6
+wDanger::
 ; bit 7: on/off
 ; bit 4: pitch
 ; bit 0-3: counter
-	ds 1
-MusicFade:: ; c2a7
+	db
+
+wMusicFade:: ; c2a7
 ; fades volume over x frames
 ; bit 7: fade in/out
 ; bit 0-5: number of frames for each volume level
 ; $00 = none (default)
-	ds 1
-MusicFadeCount:: ; c2a8
-	ds 1
-MusicFadeID::
-MusicFadeIDLo:: ; c2a9
-	ds 1
-MusicFadeIDHi:: ; c2aa
-	ds 1
+	db
+wMusicFadeCount:: db ; c2a8
+wMusicFadeID:: dw ; c2a9
+
 	ds 5
-CryPitch:: ; c2b0
-	ds 1
-CryEcho:: ; c2b1
-	ds 1
-CryLength:: ; c2b2
-	ds 2
-LastVolume:: ; c2b4
-	ds 1
-	ds 1
-SFXPriority:: ; c2b6
+
+wCryPitch:: dw ; c2b0
+wCryLength:: dw ; c2b2
+
+wLastVolume:: db ; c2b4
+wUnusedMusicF9Flag:: db ; c2b5
+
+wSFXPriority:: ; c2b6
 ; if nonzero, turn off music when playing sfx
+	db
+
 	ds 1
-	ds 6
-CryTracks:: ; c2bd
+
+wChannel1JumpCondition:: db
+wChannel2JumpCondition:: db
+wChannel3JumpCondition:: db
+wChannel4JumpCondition:: db
+
+wStereoPanningMask:: db ; c2bc
+
+wCryTracks:: ; c2bd
 ; plays only in left or right track depending on what side the monster is on
 ; both tracks active outside of battle
-	ds 1
-	ds 1
-CurSFX:: ; c2bf
+	db
+
+wSFXDuration:: db
+wCurSFX:: ; c2bf
 ; id of sfx currently playing
-	ds 1
-CurMusic:: ; c2c0
-; id of music currently playing
-	ds 1
+	db
+wChannelsEnd::
 
-wTranspositionInterval:: ds 1
+wMapMusic:: db ; c2c0
 
-; misc crys labels
-Options:: ds 1
-GBPrinter:: ds 1
-PlayerState:: ds 1
-
-wSongSelection:: ds 2
-wNumNoteLines:: ds 1
-wTmpCh:: ds 1
-wChLastNotes:: ds 3
-wVolTimer:: ds 1
-wC1Vol:: ds 1
-wC1VolSub:: ds 1
-wC2Vol:: ds 1
-wC2VolSub:: ds 1
-wC3Vol:: ds 1
-wC3VolSub:: ds 1
-wC4Vol:: ds 1
-wC4VolSub:: ds 1
-wNoteEnded:: ds 3
-wSelectorTop:: ds 1
-wSelectorCur:: ds 1
-wChannelSelector:: ds 1
-wChannelSelectorSwitches:: ds 8
+;wDontPlayMapMusicOnReload:: db
+wMusicEnd::
